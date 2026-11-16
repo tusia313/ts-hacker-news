@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker News | ui.dev & TypeScript</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/" id="nav-top">Top</a></li>
+                    <li><a href="/new" id="nav-new">New</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" id="theme-btn" title="Toggle Light/Dark Mode">🔦</button>
+        </header>
+
+        <!-- ANIMOWANY LOADER (pokazuje się natychmiast po kliknięciu w link) -->
+        <div id="loader-overlay" style="display: none;">
+            <div class="loader-box">
+                <div class="spinner"></div>
+                <span>Fetching live data from Hacker News API...</span>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line" style="width: 80%;"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line" style="width: 65%;"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line" style="width: 75%;"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+        </div>
+
+        <!-- GŁÓWNA ZAWARTOŚĆ WSTRZYKIWANA PRZEZ SERWER NODE.JS -->
+        <main id="app-content">
+            {{content}}
+        </main>
+    </div>
+
+    <script>
+        // 1. Obsługa przełącznika Light / Dark Mode (latarka) z zapisem w pamięci przeglądarki
+        const themeBtn = document.getElementById('theme-btn');
+        if (localStorage.getItem('hn-theme') === 'light') {
+            document.body.classList.add('light-mode');
+            themeBtn.textContent = '🌙';
+        }
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('hn-theme', isLight ? 'light' : 'dark');
+            themeBtn.textContent = isLight ? '🌙' : '🔦';
+        });
+
+        // 2. Podświetlenie aktywnej zakładki (Top vs New)
+        const path = window.location.pathname;
+        if (path === '/') document.getElementById('nav-top')?.classList.add('active');
+        if (path === '/new') document.getElementById('nav-new')?.classList.add('active');
+
+        // 3. Pokazywanie animowanego loadera podczas ładowania kolejnej podstrony z API
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('/') && !e.metaKey && !e.ctrlKey) {
+                    document.getElementById('app-content').style.display = 'none';
+                    document.getElementById('loader-overlay').style.display = 'flex';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

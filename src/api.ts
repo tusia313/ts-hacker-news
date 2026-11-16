@@ -3,6 +3,7 @@
 import { HNItem, HNUser } from './types';
 
 const BASE_URL = 'https://hacker-news.firebaseio.com/v0';
+// asynchroniczna funkcja, która przyjmuje numer id (np. 8863), pobiera z API pojedynczy artykuł lub komentarz i zwraca go jako obiekt typu HNItem
 export async function fetchItem(id: number): Promise<HNItem> {
     const response = await fetch(`${BASE_URL}/item/${id}.json`);
     if (!response.ok) {
@@ -18,6 +19,7 @@ export async function fetchMainPosts(type: 'top' | 'new'): Promise<HNItem[]> {
     }
     const ids: number[] = await response.json();
     const topIds = ids.slice(0, 30);
+    // zamieniamy każdy numer ID na wywołanie Twojej funkcji fetchItem i odpalamy je wszystkie równolegle za pomocą Promise.all:
     const posts = await Promise.all(topIds.map((id) => fetchItem(id)));
 return posts;
 }

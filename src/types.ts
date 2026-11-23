@@ -29,10 +29,5 @@ export interface HNUser {
   submitted?: number[]; // Lista ID wszystkich nadesłanych historii, ankiet i komentarzy
 }
 
-// Interfejs dla endpointu aktualizacji (ostatnio zmienione ID)
-export interface HNUpdates {
-  items: number[];      // Lista niedawno zmienionych ID elementów
-  profiles: string[];   // Lista niedawno zaktualizowanych profili użytkowników
-}
 // Wszystko ma słówko export, ponieważ pliki takie jak api.ts czy index.ts będą mogły te typy bez problemu zaimportować (np. import { HNItem } from './types')
 //

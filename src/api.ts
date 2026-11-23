@@ -1,37 +1,37 @@
-//funkcje odpowiedzialne za odpytywanie serwerów Hacker News (fetch, Promise.all)
+const TOP_POSTS_URL = "https://hacker-news.firebaseio.com/v0/topstories.json";
+const NEW_POSTS_URL = "https://hacker-news.firebaseio.com/v0/newstories.json";
+const USER_URL_BASE = "https://hacker-news.firebaseio.com/v0/user/";
+const STORY_URL_BASE = "https://hacker-news.firebaseio.com/v0/item/";
 
-import { HNItem, HNUser } from './types';
-
-const BASE_URL = 'https://hacker-news.firebaseio.com/v0';
-// asynchroniczna funkcja, która przyjmuje numer id (np. 8863), pobiera z API pojedynczy artykuł lub komentarz i zwraca go jako obiekt typu HNItem
-export async function fetchItem(id: number): Promise<HNItem> {
-    const response = await fetch(`${BASE_URL}/item/${id}.json`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch item with ID ${id}`);
-    }
-    const data: HNItem = await response.json();
-    return data;
+function getStoryUrl(story: number): string {
+    return `${STORY_URL_BASE}${story}.json`;
 }
-export async function fetchMainPosts(type: 'top' | 'new'): Promise<HNItem[]> {
-    const response = await fetch(`${BASE_URL}/${type}stories.json`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch main posts`);
-    }
-    const ids: number[] = await response.json();
-    const topIds = ids.slice(0, 30);
-    // zamieniamy każdy numer ID na wywołanie Twojej funkcji fetchItem i odpalamy je wszystkie równolegle za pomocą Promise.all:
-    const posts = await Promise.all(topIds.map((id) => fetchItem(id)));
-return posts;
-}
-export async function fetchUser(id: string): Promise<HNUser> {
-    const response = await fetch(`${BASE_URL}/user/${id}.json`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch user with ID ${id}`);
-    }
-    const data: HNUser = await response.json();
-    return data;
-}
-export async function fetchComments(ids: number[]): Promise<HNItem[]> {
-    return Promise.all(ids.slice(0, 30).map((id) => fetchItem(id)));
+function getUserUrl(user: string): string {
+    return `${USER_URL_BASE}${user}.json`;
 }
 
+export interface Story {
+    id: number;
+    deleted?: boolean;
+    type: 'job' | 'story' | 'comment' | 'poll' | 'pollopt';
+    by?: string;
+    time: number;
+    text?: string;
+    dead?: boolean;
+    parent?: number;
+    poll?: number;
+    kids?: number[];
+    url?: string;
+    score?: number;
+    title?: string;
+    parts?: number[];
+    descendants?: number;
+}
+
+export interface User {
+    id: string;
+    created: number;
+    karma: number;
+    about?: string;
+    submitted?: number[];
+}
